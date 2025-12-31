@@ -1,0 +1,14 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Cyrus L Coulter</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <h1>cyruslcoulter.com</h1>
+    <p>Site is live. Now we cook.</p>
+    <script src="script.js"></script>
+  </body>
+</html>
