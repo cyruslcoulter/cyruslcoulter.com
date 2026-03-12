@@ -3,109 +3,157 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cyrus L Coulter</title>
+    <title>Cyrus L Coulter | Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background-color: #0a0a0a; color: #ededed; font-family: 'Inter', sans-serif; }
-        .bento-card { background: #161616; border: 1px solid #262626; border-radius: 1.5rem; padding: 1.5rem; transition: border 0.3s; }
-        .bento-card:hover { border-color: #3f3f46; }
-        .edit-input { background: #262626; border: 1px solid #3f3f46; border-radius: 0.5rem; padding: 0.2rem 0.5rem; width: 100%; color: #60a5fa; outline: none; }
-        .edit-input:focus { border-color: #60a5fa; }
-        .hidden { display: none; }
+        body { background-color: #0a0a0a; color: #ededed; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            grid-auto-rows: 150px;
+            gap: 1rem;
+            padding-bottom: 100px;
+        }
+        .tile {
+            background: #161616;
+            border: 1px solid #262626;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            transition: border 0.2s, transform 0.1s;
+        }
+        .tile-edit-mode { border: 1px dashed #60a5fa; cursor: move; }
+        .resizer {
+            width: 15px; height: 15px;
+            background: #60a5fa;
+            position: absolute; right: 10px; bottom: 10px;
+            cursor: nwse-resize; border-radius: 2px; display: none;
+        }
+        .tile-edit-mode .resizer { display: block; }
+        .edit-controls {
+            position: fixed; bottom: 2rem; left: 2rem;
+            display: flex; gap: 1rem; align-items: center; z-index: 50;
+        }
+        [contenteditable]:focus { outline: none; border-bottom: 1px solid #60a5fa; }
     </style>
 </head>
 <body class="p-6 md:p-12">
 
-    <header class="max-w-5xl mx-auto mb-12 flex justify-between items-end">
-        <div>
-            <h1 class="text-4xl font-bold tracking-tight">Cyrus L Coulter</h1>
-            <p class="text-zinc-500 mt-2">Personal Dashboard</p>
-        </div>
-        <button onclick="handleEditClick()" id="editBtn" class="text-xs bg-zinc-800 hover:bg-zinc-700 px-4 py-2 rounded-full text-zinc-400 transition">
-            Edit Page
-        </button>
+    <header class="max-w-6xl mx-auto mb-8">
+        <h1 class="text-4xl font-bold tracking-tight">Cyrus L Coulter</h1>
+        <p class="text-zinc-500 mt-2">Personal Dashboard</p>
     </header>
 
-    <main class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="bento-card">
-            <h2 class="text-xl font-semibold text-emerald-400 mb-2">Banking</h2>
-            <p class="view-field text-zinc-300" id="work-view">Financial Center Consultant II</p>
-            <input class="edit-input hidden" id="work-edit" value="Financial Center Consultant II">
+    <div id="grid" class="max-w-6xl mx-auto grid-container">
         </div>
 
-        <div class="bento-card md:col-span-2">
-            <h2 class="text-xl font-semibold text-blue-400 mb-2">System Specs</h2>
-            <p class="view-field text-zinc-300" id="specs-view">i7-14700K | RTX 4070 Ti Super | 32GB RAM</p>
-            <input class="edit-input hidden" id="specs-edit" value="i7-14700K | RTX 4070 Ti Super | 32GB RAM">
-        </div>
-
-        <div class="bento-card md:col-span-3">
-            <h2 class="text-xl font-semibold text-orange-400 mb-2">Current Project</h2>
-            <p class="view-field text-zinc-300" id="focus-view">Optimizing Minecraft Java 1.21.11 farms and Baritone pathfinding.</p>
-            <textarea class="edit-input hidden h-20" id="focus-edit">Optimizing Minecraft Java 1.21.11 farms and Baritone pathfinding.</textarea>
-        </div>
-    </main>
+    <div class="edit-controls">
+        <button onclick="handleEditClick()" id="editBtn" class="bg-zinc-800 hover:bg-zinc-700 px-6 py-3 rounded-full text-zinc-400 text-sm font-medium transition shadow-lg">
+            Edit Layout
+        </button>
+        <button onclick="addTile()" id="addBtn" class="hidden bg-blue-600 hover:bg-blue-500 px-6 py-3 rounded-full text-white text-sm font-medium transition shadow-lg">
+            + Add Tile
+        </button>
+    </div>
 
     <script>
-        const PASSWORD = "140788"; 
+        const PASSWORD = "140788";
         let isEditing = false;
         let isAuthenticated = false;
 
-        // Load data from storage on startup
-        window.onload = () => {
-            const fields = ['work', 'specs', 'focus'];
-            fields.forEach(f => {
-                const saved = localStorage.getItem(f);
-                if (saved) {
-                    document.getElementById(`${f}-view`).innerText = saved;
-                    document.getElementById(`${f}-edit`).value = saved;
-                }
+        // Default Data if localstorage is empty
+        let tiles = JSON.parse(localStorage.getItem('cyrus_tiles')) || [
+            { id: 1, title: 'Banking', content: 'Financial Center Consultant II', w: 1, h: 1, color: 'text-emerald-400' },
+            { id: 2, title: 'System Specs', content: 'i7-14700K | RTX 4070 Ti Super', w: 2, h: 1, color: 'text-blue-400' },
+            { id: 3, title: 'Current Focus', content: 'Optimizing Minecraft 1.21.11 and Baritone.', w: 3, h: 1, color: 'text-orange-400' }
+        ];
+
+        function renderTiles() {
+            const grid = document.getElementById('grid');
+            grid.innerHTML = '';
+            tiles.forEach(tile => {
+                const el = document.createElement('div');
+                el.className = `tile ${isEditing ? 'tile-edit-mode' : ''}`;
+                el.style.gridColumn = `span ${tile.w}`;
+                el.style.gridRow = `span ${tile.h}`;
+                
+                el.innerHTML = `
+                    <h2 class="text-lg font-semibold ${tile.color} mb-1" 
+                        contenteditable="${isEditing}" onblur="updateTile(${tile.id}, 'title', this.innerText)">${tile.title}</h2>
+                    <p class="text-zinc-400 text-sm overflow-hidden" 
+                        contenteditable="${isEditing}" onblur="updateTile(${tile.id}, 'content', this.innerText)">${tile.content}</p>
+                    <div class="resizer" onmousedown="initResize(event, ${tile.id})"></div>
+                    ${isEditing ? `<button onclick="deleteTile(${tile.id})" class="absolute top-2 right-2 text-zinc-600 hover:text-red-500 text-xs">✕</button>` : ''}
+                `;
+                grid.appendChild(el);
             });
-        };
+        }
 
         function handleEditClick() {
             if (!isEditing) {
-                // If already authenticated this session, just open. Otherwise, ask.
-                if (isAuthenticated) {
-                    toggleUI(true);
-                } else {
-                    const attempt = prompt("Enter password to unlock fields:");
-                    if (attempt === PASSWORD) {
-                        isAuthenticated = true;
-                        toggleUI(true);
-                    } else {
-                        alert("Wrong password.");
-                    }
-                }
+                if (isAuthenticated || prompt("Enter password:") === PASSWORD) {
+                    isAuthenticated = true;
+                    isEditing = true;
+                    document.getElementById('editBtn').innerText = "Finish & Save";
+                    document.getElementById('editBtn').classList.replace('bg-zinc-800', 'bg-emerald-600');
+                    document.getElementById('addBtn').classList.remove('hidden');
+                    renderTiles();
+                } else { alert("Wrong password."); }
             } else {
-                saveData();
-                toggleUI(false);
+                isEditing = false;
+                document.getElementById('editBtn').innerText = "Edit Layout";
+                document.getElementById('editBtn').classList.replace('bg-emerald-600', 'bg-zinc-800');
+                document.getElementById('addBtn').classList.add('hidden');
+                localStorage.setItem('cyrus_tiles', JSON.stringify(tiles));
+                renderTiles();
             }
         }
 
-        function toggleUI(editMode) {
-            isEditing = editMode;
-            const btn = document.getElementById('editBtn');
-            const views = document.querySelectorAll('.view-field');
-            const inputs = document.querySelectorAll('.edit-input');
-
-            btn.innerText = editMode ? "Save Changes" : "Edit Page";
-            btn.className = editMode ? 
-                "text-xs bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-full text-white transition" : 
-                "text-xs bg-zinc-800 hover:bg-zinc-700 px-4 py-2 rounded-full text-zinc-400 transition";
-
-            views.forEach(v => v.classList.toggle('hidden', editMode));
-            inputs.forEach(i => i.classList.toggle('hidden', !editMode));
+        function updateTile(id, field, value) {
+            const tile = tiles.find(t => t.id === id);
+            if (tile) tile[field] = value;
         }
 
-        function saveData() {
-            const fields = ['work', 'specs', 'focus'];
-            fields.forEach(f => {
-                const val = document.getElementById(`${f}-edit`).value;
-                document.getElementById(`${f}-view`).innerText = val;
-                localStorage.setItem(f, val); 
-            });
+        function addTile() {
+            const newId = Date.now();
+            tiles.push({ id: newId, title: 'New Title', content: 'New Content', w: 1, h: 1, color: 'text-zinc-400' });
+            renderTiles();
         }
+
+        function deleteTile(id) {
+            tiles = tiles.filter(t => t.id !== id);
+            renderTiles();
+        }
+
+        function initResize(e, id) {
+            e.preventDefault();
+            const tile = tiles.find(t => t.id === id);
+            const startX = e.clientX;
+            const startY = e.clientY;
+            const startW = tile.w;
+            const startH = tile.h;
+
+            function doResize(moveEvent) {
+                const diffX = moveEvent.clientX - startX;
+                const diffY = moveEvent.clientY - startY;
+                // Snap to grid logic (roughly 150px per unit)
+                tile.w = Math.max(1, startW + Math.round(diffX / 160));
+                tile.h = Math.max(1, startH + Math.round(diffY / 160));
+                renderTiles();
+            }
+
+            function stopResize() {
+                window.removeEventListener('mousemove', doResize);
+                window.removeEventListener('mouseup', stopResize);
+            }
+
+            window.addEventListener('mousemove', doResize);
+            window.addEventListener('mouseup', stopResize);
+        }
+
+        renderTiles();
     </script>
 </body>
 </html>
