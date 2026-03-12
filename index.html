@@ -93,36 +93,62 @@
 
     </main>
 
-    <script>
-        let isEditing = false;
+<script>
+    let isEditing = false;
+    // This is the hashed version of "admin123"
+    const HASHED_PW = "541756509"; 
 
-        function toggleEdit() {
-            isEditing = !isEditing;
-            const btn = document.getElementById('editBtn');
-            const views = document.querySelectorAll('.view-field, #cpu-view, #gpu-view, #ram-view, #storage-view, #role-view, #focus-view');
-            const inputs = document.querySelectorAll('.edit-input');
+    // Simple hashing function
+    const hashCode = s => s.split('').reduce((a, b) => { 
+        a = (a << 5) - a + b.charCodeAt(0); 
+        return a & a; 
+    }, 0);
 
-            if (isEditing) {
-                btn.innerText = "Save Changes";
-                btn.classList.add('bg-blue-600', 'text-white');
-                views.forEach(v => v.classList.add('hidden'));
-                inputs.forEach(i => i.classList.remove('hidden'));
+    function toggleEdit() {
+        if (!isEditing) {
+            // Step 1: Ask for password before entering Edit Mode
+            const attempt = prompt("Enter Admin Password to Edit:");
+            
+            if (hashCode(attempt) == HASHED_PW) {
+                enterEditMode();
             } else {
-                btn.innerText = "Enter Edit Mode";
-                btn.classList.remove('bg-blue-600', 'text-white');
-                
-                // Update views with new input values
-                document.getElementById('cpu-view').innerText = document.getElementById('cpu-edit').value;
-                document.getElementById('gpu-view').innerText = document.getElementById('gpu-edit').value;
-                document.getElementById('focus-view').innerText = document.getElementById('focus-edit').value;
-
-                views.forEach(v => v.classList.remove('hidden'));
-                inputs.forEach(i => i.classList.add('hidden'));
-                
-                // Note: In a real app, you'd send this data to a database here.
-                console.log("Data saved locally!");
+                alert("Access Denied: Incorrect Password.");
             }
+        } else {
+            // Step 2: Save and exit
+            saveAndExit();
         }
-    </script>
-</body>
-</html>
+    }
+
+    function enterEditMode() {
+        isEditing = true;
+        const btn = document.getElementById('editBtn');
+        const views = document.querySelectorAll('.view-field, #cpu-view, #gpu-view, #ram-view, #storage-view, #role-view, #focus-view');
+        const inputs = document.querySelectorAll('.edit-input');
+
+        btn.innerText = "Save Changes";
+        btn.classList.add('bg-blue-600', 'text-white');
+        views.forEach(v => v.classList.add('hidden'));
+        inputs.forEach(i => i.classList.remove('hidden'));
+    }
+
+    function saveAndExit() {
+        isEditing = false;
+        const btn = document.getElementById('editBtn');
+        const views = document.querySelectorAll('.view-field, #cpu-view, #gpu-view, #ram-view, #storage-view, #role-view, #focus-view');
+        const inputs = document.querySelectorAll('.edit-input');
+
+        btn.innerText = "Enter Edit Mode";
+        btn.classList.remove('bg-blue-600', 'text-white');
+        
+        // Update views
+        document.getElementById('cpu-view').innerText = document.getElementById('cpu-edit').value;
+        document.getElementById('gpu-view').innerText = document.getElementById('gpu-edit').value;
+        document.getElementById('focus-view').innerText = document.getElementById('focus-edit').value;
+
+        views.forEach(v => v.classList.remove('hidden'));
+        inputs.forEach(i => i.classList.add('hidden'));
+        
+        console.log("Changes saved to the browser view!");
+    }
+</script>
