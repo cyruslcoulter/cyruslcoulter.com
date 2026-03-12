@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cyrus L Coulter | Dashboard</title>
+    <title>Cyrus L Coulter</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background-color: #0a0a0a; color: #ededed; font-family: 'Inter', sans-serif; }
-        .bento-card { background: #161616; border: 1px solid #262626; border-radius: 1.5rem; padding: 1.5rem; transition: all 0.3s ease; }
-        .bento-card:hover { border-color: #404040; transform: translateY(-2px); }
-        .edit-input { background: #262626; border: 1px solid #3f3f46; border-radius: 0.5rem; padding: 0.2rem 0.5rem; width: 100%; color: #60a5fa; }
+        .bento-card { background: #161616; border: 1px solid #262626; border-radius: 1.5rem; padding: 1.5rem; transition: border 0.3s; }
+        .bento-card:hover { border-color: #3f3f46; }
+        .edit-input { background: #262626; border: 1px solid #3f3f46; border-radius: 0.5rem; padding: 0.2rem 0.5rem; width: 100%; color: #60a5fa; outline: none; }
+        .edit-input:focus { border-color: #60a5fa; }
         .hidden { display: none; }
     </style>
 </head>
@@ -18,137 +19,93 @@
     <header class="max-w-5xl mx-auto mb-12 flex justify-between items-end">
         <div>
             <h1 class="text-4xl font-bold tracking-tight">Cyrus L Coulter</h1>
-            <p class="text-zinc-500 mt-2">Financial Center Consultant II & Tech Enthusiast</p>
+            <p class="text-zinc-500 mt-2">Personal Dashboard</p>
         </div>
-        <button onclick="toggleEdit()" id="editBtn" class="text-xs bg-zinc-800 hover:bg-zinc-700 px-4 py-2 rounded-full text-zinc-400">
-            Enter Edit Mode
+        <button onclick="handleEditClick()" id="editBtn" class="text-xs bg-zinc-800 hover:bg-zinc-700 px-4 py-2 rounded-full text-zinc-400 transition">
+            Edit Page
         </button>
     </header>
 
     <main class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4">
-        
-        <div class="bento-card md:col-span-2">
-            <div class="flex justify-between items-start mb-4">
-                <h2 class="text-xl font-semibold text-blue-400">Current Rig</h2>
-                <span class="text-[10px] bg-blue-500/10 text-blue-400 px-2 py-1 rounded">High Performance</span>
-            </div>
-            <div class="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                    <p class="text-zinc-500">CPU</p>
-                    <p class="view-field" id="cpu-view">Intel i7-14700K</p>
-                    <input class="edit-input hidden" id="cpu-edit" value="Intel i7-14700K">
-                </div>
-                <div>
-                    <p class="text-zinc-500">GPU</p>
-                    <p class="view-field" id="gpu-view">RTX 4070 Ti Super</p>
-                    <input class="edit-input hidden" id="gpu-edit" value="RTX 4070 Ti Super">
-                </div>
-                <div>
-                    <p class="text-zinc-500">RAM</p>
-                    <p class="view-field" id="ram-view">32 GB</p>
-                    <input class="edit-input hidden" id="ram-edit" value="32 GB">
-                </div>
-                <div>
-                    <p class="text-zinc-500">Storage</p>
-                    <p class="view-field" id="storage-view">4 TB SSD Total</p>
-                    <input class="edit-input hidden" id="storage-edit" value="4 TB SSD Total">
-                </div>
-            </div>
-        </div>
-
         <div class="bento-card">
             <h2 class="text-xl font-semibold text-emerald-400 mb-2">Banking</h2>
-            <p class="text-sm text-zinc-400 mb-4">Focused on financial consulting and North Texas market growth.</p>
-            <div class="text-sm space-y-2">
-                <div class="flex justify-between">
-                    <span class="text-zinc-500">Role:</span>
-                    <span id="role-view">FCC II</span>
-                    <input class="edit-input hidden" id="role-edit" value="FCC II">
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-zinc-500">Location:</span>
-                    <span>DFW Metroplex</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="bento-card">
-            <h2 class="text-xl font-semibold text-purple-400 mb-2">Gaming</h2>
-            <ul class="text-sm space-y-1 text-zinc-300">
-                <li>• Minecraft 1.21.11</li>
-                <li>• Anarchy & Optimization</li>
-                <li>• Clash Royale</li>
-            </ul>
+            <p class="view-field text-zinc-300" id="work-view">Financial Center Consultant II</p>
+            <input class="edit-input hidden" id="work-edit" value="Financial Center Consultant II">
         </div>
 
         <div class="bento-card md:col-span-2">
-            <h2 class="text-xl font-semibold text-orange-400 mb-2">Development Log</h2>
-            <p class="text-sm text-zinc-400 italic">"Objective evaluation leads to consistent growth."</p>
-            <div class="mt-4 p-3 bg-zinc-900/50 rounded-xl border border-zinc-800">
-                <p class="text-xs text-zinc-500 uppercase mb-1">Current Focus</p>
-                <p class="text-sm" id="focus-view">Improving Baritone pathfinding and local financial market analysis.</p>
-                <textarea class="edit-input hidden h-20" id="focus-edit">Improving Baritone pathfinding and local financial market analysis.</textarea>
-            </div>
+            <h2 class="text-xl font-semibold text-blue-400 mb-2">System Specs</h2>
+            <p class="view-field text-zinc-300" id="specs-view">i7-14700K | RTX 4070 Ti Super | 32GB RAM</p>
+            <input class="edit-input hidden" id="specs-edit" value="i7-14700K | RTX 4070 Ti Super | 32GB RAM">
         </div>
 
+        <div class="bento-card md:col-span-3">
+            <h2 class="text-xl font-semibold text-orange-400 mb-2">Current Project</h2>
+            <p class="view-field text-zinc-300" id="focus-view">Optimizing Minecraft Java 1.21.11 farms and Baritone pathfinding.</p>
+            <textarea class="edit-input hidden h-20" id="focus-edit">Optimizing Minecraft Java 1.21.11 farms and Baritone pathfinding.</textarea>
+        </div>
     </main>
 
-<script>
-    let isEditing = false;
-    // This is the hashed version of "admin123"
-    const HASHED_PW = "541756509"; 
+    <script>
+        const PASSWORD = "140788"; 
+        let isEditing = false;
+        let isAuthenticated = false;
 
-    // Simple hashing function
-    const hashCode = s => s.split('').reduce((a, b) => { 
-        a = (a << 5) - a + b.charCodeAt(0); 
-        return a & a; 
-    }, 0);
+        // Load data from storage on startup
+        window.onload = () => {
+            const fields = ['work', 'specs', 'focus'];
+            fields.forEach(f => {
+                const saved = localStorage.getItem(f);
+                if (saved) {
+                    document.getElementById(`${f}-view`).innerText = saved;
+                    document.getElementById(`${f}-edit`).value = saved;
+                }
+            });
+        };
 
-    function toggleEdit() {
-        if (!isEditing) {
-            // Step 1: Ask for password before entering Edit Mode
-            const attempt = prompt("Enter Admin Password to Edit:");
-            
-            if (hashCode(attempt) == HASHED_PW) {
-                enterEditMode();
+        function handleEditClick() {
+            if (!isEditing) {
+                // If already authenticated this session, just open. Otherwise, ask.
+                if (isAuthenticated) {
+                    toggleUI(true);
+                } else {
+                    const attempt = prompt("Enter password to unlock fields:");
+                    if (attempt === PASSWORD) {
+                        isAuthenticated = true;
+                        toggleUI(true);
+                    } else {
+                        alert("Wrong password.");
+                    }
+                }
             } else {
-                alert("Access Denied: Incorrect Password.");
+                saveData();
+                toggleUI(false);
             }
-        } else {
-            // Step 2: Save and exit
-            saveAndExit();
         }
-    }
 
-    function enterEditMode() {
-        isEditing = true;
-        const btn = document.getElementById('editBtn');
-        const views = document.querySelectorAll('.view-field, #cpu-view, #gpu-view, #ram-view, #storage-view, #role-view, #focus-view');
-        const inputs = document.querySelectorAll('.edit-input');
+        function toggleUI(editMode) {
+            isEditing = editMode;
+            const btn = document.getElementById('editBtn');
+            const views = document.querySelectorAll('.view-field');
+            const inputs = document.querySelectorAll('.edit-input');
 
-        btn.innerText = "Save Changes";
-        btn.classList.add('bg-blue-600', 'text-white');
-        views.forEach(v => v.classList.add('hidden'));
-        inputs.forEach(i => i.classList.remove('hidden'));
-    }
+            btn.innerText = editMode ? "Save Changes" : "Edit Page";
+            btn.className = editMode ? 
+                "text-xs bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-full text-white transition" : 
+                "text-xs bg-zinc-800 hover:bg-zinc-700 px-4 py-2 rounded-full text-zinc-400 transition";
 
-    function saveAndExit() {
-        isEditing = false;
-        const btn = document.getElementById('editBtn');
-        const views = document.querySelectorAll('.view-field, #cpu-view, #gpu-view, #ram-view, #storage-view, #role-view, #focus-view');
-        const inputs = document.querySelectorAll('.edit-input');
+            views.forEach(v => v.classList.toggle('hidden', editMode));
+            inputs.forEach(i => i.classList.toggle('hidden', !editMode));
+        }
 
-        btn.innerText = "Enter Edit Mode";
-        btn.classList.remove('bg-blue-600', 'text-white');
-        
-        // Update views
-        document.getElementById('cpu-view').innerText = document.getElementById('cpu-edit').value;
-        document.getElementById('gpu-view').innerText = document.getElementById('gpu-edit').value;
-        document.getElementById('focus-view').innerText = document.getElementById('focus-edit').value;
-
-        views.forEach(v => v.classList.remove('hidden'));
-        inputs.forEach(i => i.classList.add('hidden'));
-        
-        console.log("Changes saved to the browser view!");
-    }
-</script>
+        function saveData() {
+            const fields = ['work', 'specs', 'focus'];
+            fields.forEach(f => {
+                const val = document.getElementById(`${f}-edit`).value;
+                document.getElementById(`${f}-view`).innerText = val;
+                localStorage.setItem(f, val); 
+            });
+        }
+    </script>
+</body>
+</html>
